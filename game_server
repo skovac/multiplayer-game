@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+
+import socket
+import threading
+
+HOST = "127.0.0.1"
+PORT = 62000
+
+class player:
+    def __init__(self, playerID = "", conn = None, addr = ""):
+        self.playerID = playerID
+        self.conn = conn
+        self.addr = addr
+
+
+def play_server(player1, player2):
+    gameInfo = "New game between:\n" + player1.playerID + "  ||  ip: " + player1.addr[0]
+    gameInfo += "\n" + player2.playerID + "  ||  ip: " + player2.addr[0]
+    print(gameInfo)
+
+    data = ""
+    while "stop" not in data:
+        dataPlayer1 = player1.conn.recv(1024)
+        dataPlayer2 = player2.conn.recv(1024)
+        player1.conn.sendall(dataPlayer2)
+        player2.conn.sendall(dataPlayer1)
+
+        data = dataPlayer1.decode() + dataPlayer2.decode()
+
+
+def accept_connection(sock):
+    pl = player()
+    pl.conn, pl.addr = sock.accept()
+    pl.playerID = pl.conn.recv(1024).decode()
+    pl.conn.sendall(b"ok")
+    
+    return pl
+
+
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind((HOST, PORT))
+        sock.listen()
+        run = True
+        while run:
+            player1 = accept_connection(sock)
+            player2 = accept_connection(sock)
+            newGame = threading.Thread(target = play_server, args = (player1, player2))
+            newGame.start()
+
+if __name__ == "__main__":
+    main()
