@@ -3,9 +3,7 @@
 import socket
 import json
 
-import game_parser
-
-HOST = "127.0.0.1"
+HOST = ""
 DISPATCH_PORT = 62000
 
 

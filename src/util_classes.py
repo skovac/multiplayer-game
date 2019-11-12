@@ -36,7 +36,6 @@ class Projectiles:
         for laser in self.lasers:
             if laser.isShot and laser.y > 0 - laser.height:
                 laser.y -= laser.speed
-                print(laser.x, laser.y)
             else:
                 laser.isShot = False
     

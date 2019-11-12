@@ -67,7 +67,7 @@ def main():
         oppPlayer.draw()
         pg.display.flip()
 
-        pg.time.wait(10)
+        #pg.time.wait(10)
 
     sock.close()
 
