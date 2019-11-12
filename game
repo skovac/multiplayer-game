@@ -11,27 +11,20 @@ import server_com
 from util_classes import *
 
 
-ship = pg.image.load("media/blueship.png")
-oppShip = pg.transform.rotate(ship, 180)
-laserPic = pg.image.load("media/laser.png")
-
-
-def keyboard_event_handler(player, pressed, rec, playerProj, sock):
+def keyboard_event_handler(player, pressed, sock):
     if pressed[pg.K_LEFT]:
-        rec.move_left()
+        player.move_left()
     if pressed[pg.K_RIGHT]:
-        rec.move_right()
+        player.move_right()
     if pressed[pg.K_UP]:
-        rec.move_up()
+        player.move_up()
     if pressed[pg.K_DOWN]:
-        rec.move_down()
+        player.move_down()
     if pressed[pg.K_SPACE]:
-        playerProj.shoot(player.x + player.width / 2, player.y)
+        player.proj.shoot(player.x, player.y, player.width)
     if pressed[pg.K_q]:
         server_com.stop_connection(sock)
         exit()
-
-    return rec
 
 
 def main():
@@ -49,31 +42,29 @@ def main():
     startx = (WIDTH / 2) - (playerWidth / 2) 
     starty = HEIGHT - 50
     
-    player = PlayerShip(ship, startx, starty, 35, 35, WIDTH, HEIGHT, 2)
-    playerProj = Projectiles(laserPic, screen, HEIGHT)
-    oppPlayer = PlayerShip(oppShip, startx, 50, 35, 35, WIDTH, HEIGHT, 2)
-    oppInfo = PlayerInfo(screen, laserPic, oppShip)
+    player = PlayerShip(startx, starty, 35, 35, WIDTH, HEIGHT, 2, screen)
+    oppPlayer = PlayerShip(startx, 50, 35, 35, WIDTH, HEIGHT, 2, screen)
+    oppPlayer.rotate_pic()
+    
     sock = server_com.get_socket(PLAYERID)
     if not sock:
         print ("[ERROR] Connection failed")
-        return
+        return        
 
-    run = True
-    while run:
+    while not oppPlayer.disconnected:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
 
-        player = keyboard_event_handler(player, pg.key.get_pressed(), player, playerProj, sock) 
-        playerProj.refresh_position()
-        oppInfo = server_com.send_to_server(sock, PLAYERID, player.x, player.y, playerProj.lasers, oppInfo)
-        oppInfo.invert_values(WIDTH, HEIGHT, player.width, player.height)
+        keyboard_event_handler(player, pg.key.get_pressed(), sock)
+        player.proj.refresh_position()
 
+        oppPlayer.fromJson(server_com.send_to_server(sock, player))
+    
         screen.fill((0, 0, 0,))
         pg.draw.rect(screen, (0, 0, 255), pg.Rect(0, (HEIGHT / 2) - 1, WIDTH, 2))
-        screen.blit(player.pic, (player.x, player.y))
-        playerProj.draw()
-        oppInfo.draw() 
+        player.draw()
+        oppPlayer.draw()
         pg.display.flip()
 
         pg.time.wait(10)

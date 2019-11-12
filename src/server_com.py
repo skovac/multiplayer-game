@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import socket
+import json
 
 import game_parser
 
@@ -27,21 +28,12 @@ def stop_connection(sock):
     sock.sendall(data.encode())
 
 
-def make_laser_string(lasers):
-    laserString = "$lasers<|"
-    for laser in lasers:
-        if laser.isShot:
-            laserString += str(laser.x) + ":" + str(laser.y) + "|"
-    laserString += ">"
-
-    return laserString
-
-
-def send_to_server(sock, playerID, x, y, lasers, oppInfo):
-    data = "$id<" + str(playerID) + ">$x<" + str(x) + ">$y<" + str(y) + ">"
-    data += make_laser_string(lasers)
+def send_to_server(sock, player):
+    data = player.toJson()
     sock.sendall(data.encode())
-    retString = sock.recv(1024).decode()
-    oppInfo = game_parser.parse_info_string(retString, oppInfo)
+    data = sock.recv(2048).decode()
 
-    return oppInfo
+    if data == "stop":
+        return None
+    
+    return data
