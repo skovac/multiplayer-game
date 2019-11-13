@@ -43,7 +43,7 @@ def main():
     starty = HEIGHT - 50
     
     player = PlayerShip(startx, starty, 35, 35, WIDTH, HEIGHT, 2, screen)
-    oppPlayer = PlayerShip(startx, 50, 35, 35, WIDTH, HEIGHT, 2, screen)
+    oppPlayer = PlayerShip(startx, 50, 35, 35, WIDTH, HEIGHT, 0, screen)
     oppPlayer.rotate_pic()
     
     sock = server_com.get_socket(PLAYERID)
@@ -67,7 +67,7 @@ def main():
         oppPlayer.draw()
         pg.display.flip()
 
-        #pg.time.wait(10)
+        pg.time.wait(10)
 
     sock.close()
 

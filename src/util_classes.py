@@ -105,7 +105,7 @@ class PlayerShip:
         for laser in self.proj.lasers:
             if laser.isShot:
                 self.screen.blit(self.proj.pic, (laser.x, laser.y))
-
+            
         self.screen.blit(self.ship, (self.x, self.y))
 
     def toJson(self):
@@ -116,8 +116,9 @@ class PlayerShip:
         i = 0
         laserData = [(0, 0) for i in range(20)]
         for laser in self.proj.lasers:
-            laserData[i] = (laser.x, laser.y)
-            i += 1
+            if laser.isShot:
+                laserData[i] = (laser.x, laser.y)
+                i += 1
 
         data["nbOfLasers"] = i
         data["lasers"] = laserData
@@ -133,6 +134,9 @@ class PlayerShip:
 
         self.x = data["x"]
         self.y = data["y"]
+
+        for laser in self.proj.lasers:
+            laser.isShot = False
 
         for i in range(data["nbOfLasers"]):
             self.proj.lasers[i].x, self.proj.lasers[i].y = data["lasers"][i]

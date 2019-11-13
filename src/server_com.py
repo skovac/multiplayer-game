@@ -2,9 +2,12 @@
 
 import socket
 import json
+import os
 
-HOST = ""
-DISPATCH_PORT = 62000
+with open("cfg/config.json", "r") as cfgFile:
+    serverData = json.load(cfgFile)
+    HOST = serverData["server"]["host"]
+    DISPATCH_PORT = int(serverData["server"]["port"])
 
 
 def get_socket(playerID):
