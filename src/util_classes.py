@@ -12,7 +12,7 @@ laserPic = pg.transform.scale(laserPic, (10, 10))
 
 class LaserBase:
     
-    def __init__(self, width=10, height=10, speed=2):
+    def __init__(self, width=10, height=10, speed=4):
         self.x = 0
         self.y = 0
         self.width = width

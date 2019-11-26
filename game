@@ -3,6 +3,7 @@
 import pygame as pg
 import time
 import socket
+import threading
 
 import sys
 
@@ -27,6 +28,11 @@ def keyboard_event_handler(player, pressed, sock):
         exit()
 
 
+def server_loop(player, oppPlayer, sock):
+    while not oppPlayer.disconnected:
+        oppPlayer.fromJson(server_com.send_to_server(sock, player))
+
+
 def main():
     WIDTH = 400
     HEIGHT = 400
@@ -49,7 +55,10 @@ def main():
     sock = server_com.get_socket(PLAYERID)
     if not sock:
         print ("[ERROR] Connection failed")
-        return        
+        return
+
+    serverThread = threading.Thread(target=server_loop, args=(player, oppPlayer, sock))
+    serverThread.start()
 
     while not oppPlayer.disconnected:
         for event in pg.event.get():
@@ -59,7 +68,7 @@ def main():
         keyboard_event_handler(player, pg.key.get_pressed(), sock)
         player.proj.refresh_position()
 
-        oppPlayer.fromJson(server_com.send_to_server(sock, player))
+        #oppPlayer.fromJson(server_com.send_to_server(sock, player))
     
         screen.fill((0, 0, 0,))
         pg.draw.rect(screen, (0, 0, 255), pg.Rect(0, (HEIGHT / 2) - 1, WIDTH, 2))
