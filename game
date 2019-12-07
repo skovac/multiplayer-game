@@ -12,6 +12,20 @@ import server_com
 from util_classes import *
 
 
+def is_hit(shooter, receiver):
+    for laser in shooter.proj.lasers:
+        if laser.isShot:
+            if receiver.x <= laser.x <= (receiver.x + receiver.width):
+                if receiver.y <= laser.y <= (receiver.y + receiver.height):
+                    return True
+
+
+def detect_hits(player, oppPlayer):
+    if is_hit(player, oppPlayer) or is_hit(oppPlayer, player):
+        return True
+    return False
+
+
 def keyboard_event_handler(player, pressed, sock):
     if pressed[pg.K_LEFT]:
         player.move_left()
@@ -68,7 +82,10 @@ def main():
         keyboard_event_handler(player, pg.key.get_pressed(), sock)
         player.proj.refresh_position()
 
-        #oppPlayer.fromJson(server_com.send_to_server(sock, player))
+        isHit = detect_hits(player, oppPlayer)
+        if isHit:
+            oppPlayer.disconnected = True
+            player.disconnected = True
     
         screen.fill((0, 0, 0,))
         pg.draw.rect(screen, (0, 0, 255), pg.Rect(0, (HEIGHT / 2) - 1, WIDTH, 2))
