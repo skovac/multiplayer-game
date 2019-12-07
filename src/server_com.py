@@ -24,17 +24,22 @@ def get_socket(playerID):
     return None
 
 
-def stop_connection(sock):
+def stop_connection(sock, player):
     data = "stop"
     sock.sendall(data.encode())
+    player.disconnected = True
 
 
 def send_to_server(sock, player):
+    if player.disconnected:
+        return None
+
     data = player.toJson()
     sock.sendall(data.encode())
     data = sock.recv(2048).decode()
 
     if data == "stop":
+        player.disconnected = True
         return None
     
     return data

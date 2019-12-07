@@ -24,12 +24,12 @@ def keyboard_event_handler(player, pressed, sock):
     if pressed[pg.K_SPACE]:
         player.proj.shoot(player.x, player.y, player.width)
     if pressed[pg.K_q]:
-        server_com.stop_connection(sock)
-        exit()
+        server_com.stop_connection(sock, player)
+        exit(0)
 
 
 def server_loop(player, oppPlayer, sock):
-    while not oppPlayer.disconnected:
+    while not player.disconnected:
         oppPlayer.fromJson(server_com.send_to_server(sock, player))
 
 
