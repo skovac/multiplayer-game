@@ -84,8 +84,7 @@ def main():
 
         isHit = detect_hits(player, oppPlayer)
         if isHit:
-            oppPlayer.disconnected = True
-            player.disconnected = True
+            server_com.stop_connection(sock, player)
     
         screen.fill((0, 0, 0,))
         pg.draw.rect(screen, (0, 0, 255), pg.Rect(0, (HEIGHT / 2) - 1, WIDTH, 2))
